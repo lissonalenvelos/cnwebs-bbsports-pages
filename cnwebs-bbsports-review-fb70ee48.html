@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>bb体育 · 资讯查询与知识参考</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f9e6cd 0%, #fcdbb5 60%, #f5cfaa 100%);
+            min-height: 100vh;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page-wrapper {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+
+        /* 统一样式：白色卡片，圆角柔和，暖色渐变背景之上形成清晰层次 */
+        .card {
+            background: #ffffff;
+            border-radius: 2rem;
+            padding: 2rem 2.2rem;
+            box-shadow: 0 8px 18px rgba(160, 90, 40, 0.10), 0 2px 6px rgba(180, 100, 30, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.25s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 12px 26px rgba(150, 70, 20, 0.12);
+            transform: translateY(-2px);
+        }
+
+        /* hero 区特别处理：更柔和，带装饰性小边框 */
+        .hero-card {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(255, 235, 210, 0.6);
+            padding: 2.4rem 2.4rem;
+        }
+
+        .hero-title {
+            font-size: 2.4rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: #4c2e1c;
+            line-height: 1.2;
+            border-left: 6px solid #d9895b;
+            padding-left: 1.2rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .hero-sub {
+            font-size: 1.1rem;
+            color: #5f3f28;
+            margin-top: 0.6rem;
+            line-height: 1.6;
+            border-left: 6px solid #d9895b;
+            padding-left: 1.2rem;
+        }
+
+        /* 目录感布局：三列 flexible grid */
+        .directory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.4rem;
+        }
+
+        .directory-item {
+            background: #fff;
+            border-radius: 1.8rem;
+            padding: 1.4rem 1.6rem;
+            box-shadow: 0 4px 10px rgba(140, 80, 30, 0.06);
+            border: 1px solid #f7e3d0;
+            transition: all 0.15s ease;
+        }
+
+        .directory-item:hover {
+            background: #fef8f0;
+            border-color: #dab292;
+        }
+
+        .directory-item h3 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #503623;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .directory-item p {
+            font-size: 0.95rem;
+            color: #584435;
+            line-height: 1.5;
+            margin-bottom: 0.8rem;
+        }
+
+        .dir-tag {
+            display: inline-block;
+            background: #f1ddc9;
+            padding: 0.2rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            color: #5b3b26;
+            font-weight: 500;
+        }
+
+        .inline-link {
+            display: inline-block;
+            background: #eaceb9;
+            color: #3d2a1b;
+            text-decoration: none;
+            padding: 0.15rem 0.9rem;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: background 0.15s, color 0.15s;
+            margin: 0.2rem 0;
+            white-space: nowrap;
+        }
+
+        .inline-link:hover {
+            background: #d6b397;
+            color: #2d1b0f;
+            text-decoration: none;
+        }
+
+        /* 说明区 / 提示区 / 相关信息 —— 采用卡片内细分 */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #3e2a1a;
+            margin-bottom: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-title span {
+            background: #d9a77b;
+            color: #fff;
+            border-radius: 40px;
+            padding: 0 0.9rem;
+            font-size: 0.9rem;
+            line-height: 1.8rem;
+        }
+
+        .explain-text {
+            color: #3d3026;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .explain-text a {
+            color: #894f2c;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dotted #c99770;
+        }
+
+        .explain-text a:hover {
+            border-bottom: 1px solid #763d1b;
+            color: #5f321b;
+        }
+
+        .faq-mini {
+            list-style: none;
+            padding: 0;
+        }
+
+        .faq-mini li {
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #efddd0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.3rem 0.8rem;
+        }
+        .faq-mini li:last-child {
+            border-bottom: none;
+        }
+        .faq-q {
+            font-weight: 500;
+            color: #4d3120;
+            min-width: 6rem;
+        }
+        .faq-a {
+            color: #534233;
+            flex: 1;
+        }
+
+        .tip-box {
+            background: #f8ede0;
+            border-radius: 1.6rem;
+            padding: 1.2rem 1.8rem;
+            border-left: 6px solid #bd8a64;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .related-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem 0.8rem;
+            margin-top: 0.4rem;
+        }
+        .related-list span {
+            background: #f1e0d0;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: #3d291b;
+        }
+
+        hr {
+            margin: 1.4rem 0 1rem;
+            border: none;
+            border-top: 1px solid #eddacb;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #5d4431;
+            padding: 1rem 0;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.6rem;
+            }
+            .card {
+                padding: 1.4rem 1.2rem;
+                border-radius: 1.6rem;
+            }
+            .hero-card {
+                padding: 1.4rem 1.2rem;
+            }
+            .hero-title {
+                font-size: 1.8rem;
+                padding-left: 0.8rem;
+            }
+            .hero-sub {
+                font-size: 1rem;
+                padding-left: 0.8rem;
+            }
+            .directory-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+    <!-- hero 卡片：知识库入口基调 -->
+    <div class="card hero-card">
+        <div class="hero-title">查询 · 对照 · 延伸</div>
+        <div class="hero-sub">
+            bb体育 相关资讯的知识性入口 —— 用于日常信息查找、概念对照以及背景阅读。
+            这里不是快讯或结果页，而是一个结构化的索引与参考起点。
+        </div>
+    </div>
+
+    <!-- 目录感布局 —— 四个知识模块 -->
+    <div class="directory-grid">
+        <div class="directory-item">
+            <h3>📋 定义 & 背景</h3>
+            <p>bb体育 作为综合体育信息平台，涵盖赛事数据、队伍档案与历史记录。常被用于快速核对赛程与基础统计。</p>
+            <span class="dir-tag">知识卡片</span>
+        </div>
+        <div class="directory-item">
+            <h3>📌 对照参考</h3>
+            <p>横向对比联赛、杯赛数据，查看规则摘要与变动记录。适合需要反复查阅基准信息的场景。</p>
+            <span class="dir-tag">参考型</span>
+        </div>
+        <div class="directory-item">
+            <h3>📎 延伸阅读</h3>
+            <p>围绕体育百科、战术演变、管理机构沿革等专题，提供经过整理的条目与外部链接指引。</p>
+            <span class="dir-tag">专题</span>
+        </div>
+        <div class="directory-item">
+            <h3>📚 常见查询分类</h3>
+            <p>按运动项目、赛事级别、地理区域归类，减少检索步骤，提升查阅效率。</p>
+            <span class="dir-tag">索引</span>
+        </div>
+    </div>
+
+    <!-- 说明区：介绍页面定位与 bb体育 的关系 -->
+    <div class="card">
+        <div class="section-title">
+            📖 知识定位说明
+            <span>说明</span>
+        </div>
+        <div class="explain-text">
+            <p>本页以知识库入口的形式，梳理与 <a href="https://cnwebs-bbsports.com">bb体育</a> 相关的背景条目、常用参考维度以及扩展阅读方向。
+            不同于实时动态页面，这里侧重结构化信息归纳，帮助使用者在查询时快速定位概念、规则或历史脉络。</p>
+            <p style="margin-top:1rem;">例如，当需要了解某联赛的积分算法沿革，或者对比不同赛季的参赛队伍构成时，
+            借助 <a href="https://cnwebs-bbsports.com">bb体育</a> 提供的基础数据框架，可以更高效地进入对照环节。本入口页不替代具体查询结果，
+            而是充当信息索引的起点。</p>
+        </div>
+    </div>
+
+    <!-- 提示区 + FAQ 摘要融合 -->
+    <div class="card">
+        <div class="section-title">
+            💡 使用提示 & 常见疑问
+            <span>提示</span>
+        </div>
+        <div class="tip-box">
+            <strong style="color:#4a2d19;">📌 查阅建议</strong>
+            <p style="margin-top:0.4rem; color:#4e3929;">建议将 bb体育 作为数据对照的基准层。对于需要交叉验证的统计项，
+            可同时参考多个独立来源。本页所列分类仅用于引导，具体内容以实际查询返回为准。</p>
+        </div>
+        <ul class="faq-mini">
+            <li>
+                <span class="faq-q">Q: 如何快速查找特定赛季数据？</span>
+                <span class="faq-a">可通过 <a href="https://cnwebs-bbsports.com" style="text-decoration:none; border-bottom:1px dotted #b98562;">bb体育</a> 的赛季筛选模块，按年份与赛事类型缩小范围。</span>
+            </li>
+            <li>
+                <span class="faq-q">Q: 规则变动在哪里对照？</span>
+                <span class="faq-a">部分运动项目的规则修订记录收录于“延展阅读”目录，可结合官方文档交叉参考。</span>
+            </li>
+            <li>
+                <span class="faq-q">Q: 为何不直接显示实时数据？</span>
+                <span class="faq-a">本入口侧重知识索引与背景梳理，实时动态请直接访问数据页面。</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 相关信息区：延伸参考与分类标签 -->
+    <div class="card">
+        <div class="section-title">
+            🧩 相关信息区
+            <span>延伸</span>
+        </div>
+        <div class="explain-text">
+            <p>以下列出与 bb体育 平台相关的常见参考方向，可作为自助查询的辅助线索：</p>
+            <div class="related-list">
+                <span>⏺ 赛事体系对照</span>
+                <span>⏺ 历史积分榜</span>
+                <span>⏺ 参赛队伍名录</span>
+                <span>⏺ 场馆与举办地</span>
+                <span>⏺ 裁判与规则解释</span>
+                <span>⏺ 赛季里程碑</span>
+                <span>⏺ 青年联赛架构</span>
+                <span>⏺ 转会/注册窗口</span>
+                <span>⏺ 媒体版权归属</span>
+            </div>
+            <hr>
+            <p style="margin-top: 0.4rem;">同时，许多查询者也会将 <a href="https://cnwebs-bbsports.com">bb体育</a> 与联盟官方记录配合使用，
+            以获取更完整的上下文。建议在对照时留意数据版本与更新日期。</p>
+        </div>
+    </div>
+
+    <!-- 页脚 / 简单的声明 -->
+    <div class="footer-note">
+        — 知识库入口 · 仅供信息参考 —
+    </div>
+
+</div>
+</body>
+</html>
